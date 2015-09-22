@@ -147,18 +147,25 @@ exports.identify = function(pathOrArgs, callback) {
     callback = pathOrArgs;
   }
   var proc = exec2(exports.identify.path, args, {timeout:120000}, function(err, stdout, stderr) {
-    var result, geometry;
+    var result;
     if (!err) {
       if (isCustom) {
         result = stdout;
       } else {
         result = parseIdentify(stdout);
-        geometry = result['geometry'].split(/x/);
+        
+        if (result.format) {
+          result.format = result.format.match(/\S*/)[0];
+        }
 
-        result.format = result.format.match(/\S*/)[0]
-        result.width = parseInt(geometry[0]);
-        result.height = parseInt(geometry[1]);
-        result.depth = parseInt(result.depth);
+        if (result['geometry']) {
+          var geometry = result['geometry'].split(/x/);
+          result.width = parseInt(geometry[0]);
+          result.height = parseInt(geometry[1]);
+        }
+        if (result.depth) {
+          result.depth = parseInt(result.depth);
+        }
         if (result.quality !== undefined) result.quality = parseInt(result.quality) / 100;
       }
     }
