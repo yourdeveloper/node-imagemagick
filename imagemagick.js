@@ -140,8 +140,8 @@ exports.identify = function(pathOrArgs, callback) {
     isData = true;
     pathOrArgs = args[args.length-1];
     args[args.length-1] = '-';
-    if (!pathOrArgs.data)
-      throw new Error('first argument is missing the "data" member');
+    if (!pathOrArgs.data && !pathOrArgs.stream)
+      throw new Error('first argument must contain "data" or "stream" member');
   } else if (typeof pathOrArgs === 'function') {
     args[args.length-1] = '-';
     callback = pathOrArgs;
@@ -165,7 +165,9 @@ exports.identify = function(pathOrArgs, callback) {
     callback(err, result);
   });
   if (isData) {
-    if ('string' === typeof pathOrArgs.data) {
+    if (pathOrArgs.stream) {
+      pathOrArgs.stream.pipe(proc.stdin);
+    } else if ('string' === typeof pathOrArgs.data) {
       proc.stdin.setEncoding('binary');
       proc.stdin.write(pathOrArgs.data, 'binary');
       proc.stdin.end();
