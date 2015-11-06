@@ -153,7 +153,7 @@ exports.identify = function(pathOrArgs, callback) {
         result = stdout;
       } else {
         result = parseIdentify(stdout);
-        
+
         if (result.format) {
           result.format = result.format.match(/\S*/)[0];
         }
